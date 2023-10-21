@@ -19,7 +19,11 @@ char* getBoard(const char* PGN, int N){
     SCL_boardInit(board);
     uint16_t halfMoves = (uint16_t)N;
     SCL_recordApply(record, board, halfMoves);
-    SCL_boardToFEN(board, solution);
+    int t = SCL_boardToFEN(board, solution);
+    char buffer[2] = "0";
+    sprintf(buffer, "%d", (N%2));
+    const char* halfMove = buffer;
+    solution[(t-4)] = *halfMove;
     return solution;
 }
 
@@ -89,14 +93,14 @@ void testFunctions(){
 
 
     printf("getBoard :\n");
-    int hMoves = 3;
+    int hMoves = 5;
     char* temp1 = getBoard(PGN,hMoves);
     printf("half moves : %d\ninput : %s\noutput : %s\n",hMoves,PGN,temp1);
     free(temp1);
 
 
     printf("\n\ngetFirstMoves :\n");
-    hMoves = 7;
+    hMoves = 8;
     char* temp2 = getFirstMoves(PGN,hMoves);
     printf("half moves : %d\ninput : %s\noutput : %s\n",hMoves,PGN,temp2);
     free(temp2);
