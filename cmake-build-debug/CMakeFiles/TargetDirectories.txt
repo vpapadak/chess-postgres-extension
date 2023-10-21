@@ -1,0 +1,3 @@
+/home/nb/Desktop/DBSA/PgChessExtention/cmake-build-debug/CMakeFiles/PgChessExtention.dir
+/home/nb/Desktop/DBSA/PgChessExtention/cmake-build-debug/CMakeFiles/edit_cache.dir
+/home/nb/Desktop/DBSA/PgChessExtention/cmake-build-debug/CMakeFiles/rebuild_cache.dir
