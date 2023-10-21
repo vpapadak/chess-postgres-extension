@@ -6,20 +6,27 @@
 #include <math.h>
 
 int main(){
-    char str[] = "1. h4 g5 2. hxg5 Nf6 3. Nf3 Bg7 4. e3 O-O 5. Nc3 c5 "
-                 "6. d3 c4 7. b4 cxb3 8. Ba3 Qc7 9. Qd2 Nc6 10. O-O-O Nd5 "
-                 "11. cxb3 Ncb4 12. g6 Qxc3+ 13. Qc2 d6 14. gxh7+ Kh8 "
-                 "15. Qxc3 Bxc3 16. Bxb4 Kg7 17. h8=R Nxb4 18. Be2 Kf6 "
-                 "19. Rhf1 Kg7 20. Rfh1 Na6 21. R1h4*";
-    char* h = getFirstMoves(str,7);
-    printf("input : %s\noutput : %s\n",str,h);
-    free(h);
+    testFunctions();
     return 0;
 }
+
+char* getBoard(const char* PGN, int N){
+    char* solution = (char*)malloc(70 * sizeof(char));
+    strcpy(solution,"");
+    SCL_Record record;
+    SCL_recordFromPGN(record,getFirstMoves(PGN,N));
+    SCL_Board board;
+    SCL_boardInit(board);
+    uint16_t halfMoves = (uint16_t)N;
+    SCL_recordApply(record, board, halfMoves);
+    SCL_boardToFEN(board, solution);
+    return solution;
+}
+
 /*TO DO handle case when half moves asked exceeds the ones played
  * TO DO handle 0 half moves
  * TO DO handle wrong input i.e. -1...*/
-char* getFirstMoves(const char* PGN, int N){
+const char* getFirstMoves(const char* PGN, int N){
     int hMovesRemaining = N % 2;
     int fullMoves = (N/2)+hMovesRemaining;
     if(hMovesRemaining == 0){hMovesRemaining=2;}
@@ -71,4 +78,26 @@ char* getFirstMoves(const char* PGN, int N){
         strcat(firstMovesSolution,firstMoves[i]);
     };
     return firstMovesSolution;
+}
+
+void testFunctions(){
+    char PGN[] = "1. h4 g5 2. hxg5 Nf6 3. Nf3 Bg7 4. e3 O-O 5. Nc3 c5 "
+                 "6. d3 c4 7. b4 cxb3 8. Ba3 Qc7 9. Qd2 Nc6 10. O-O-O Nd5 "
+                 "11. cxb3 Ncb4 12. g6 Qxc3+ 13. Qc2 d6 14. gxh7+ Kh8 "
+                 "15. Qxc3 Bxc3 16. Bxb4 Kg7 17. h8=R Nxb4 18. Be2 Kf6 "
+                 "19. Rhf1 Kg7 20. Rfh1 Na6 21. R1h4*";
+
+
+    printf("getBoard :\n");
+    int hMoves = 3;
+    char* temp1 = getBoard(PGN,hMoves);
+    printf("half moves : %d\ninput : %s\noutput : %s\n",hMoves,PGN,temp1);
+    free(temp1);
+
+
+    printf("\n\ngetFirstMoves :\n");
+    hMoves = 7;
+    char* temp2 = getFirstMoves(PGN,hMoves);
+    printf("half moves : %d\ninput : %s\noutput : %s\n",hMoves,PGN,temp2);
+    free(temp2);
 }
