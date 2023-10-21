@@ -14,7 +14,8 @@ char* getBoard(const char* PGN, int N){
     char* solution = (char*)malloc(70 * sizeof(char));
     strcpy(solution,"");
     SCL_Record record;
-    SCL_recordFromPGN(record,getFirstMoves(PGN,N));
+    char* firstMoves = getFirstMoves(PGN,N);
+    SCL_recordFromPGN(record,firstMoves);
     SCL_Board board;
     SCL_boardInit(board);
     uint16_t halfMoves = (uint16_t)N;
@@ -24,12 +25,13 @@ char* getBoard(const char* PGN, int N){
     sprintf(buffer, "%d", (N%2));
     const char* halfMove = buffer;
     solution[(t-4)] = *halfMove;
+    free(firstMoves);
     return solution;
 }
 
-/*TO DO handle case when half moves asked exceeds the ones played
- * TO DO handle 0 half moves
- * TO DO handle wrong input i.e. -1...*/
+/*TODO handle case when half moves asked exceeds the ones played
+ *TODO handle 0 half moves
+ *TODO handle wrong input i.e. -1...*/
 const char* getFirstMoves(const char* PGN, int N){
     int hMovesRemaining = N % 2;
     int fullMoves = (N/2)+hMovesRemaining;
@@ -83,6 +85,25 @@ const char* getFirstMoves(const char* PGN, int N){
     };
     return firstMovesSolution;
 }
+//TODO do not allow an number of half moves greater that what we have
+/*TODO Function can be greatly optimized by registering and playing every movement one
+ * at a time instead of recreating the board for the PGN notation for every half moves
+ * until we arrive at N*/
+bool hasBoard(const char* PGN, const char* FEN, int N){
+    bool solution = true;
+    int countHalfMoves = 1;
+    int found = 1;
+    while(countHalfMoves<N+1 && found != 0){
+        char* tempFirstMovesBoard = getBoard(PGN, countHalfMoves);
+        found = strcmp(FEN, tempFirstMovesBoard);
+        countHalfMoves += 1;
+        free(tempFirstMovesBoard);
+    }
+    if(countHalfMoves == N+1 && found != 0){
+        solution = false;
+    }
+    return solution;
+}
 
 void testFunctions(){
     char PGN[] = "1. h4 g5 2. hxg5 Nf6 3. Nf3 Bg7 4. e3 O-O 5. Nc3 c5 "
@@ -104,4 +125,15 @@ void testFunctions(){
     char* temp2 = getFirstMoves(PGN,hMoves);
     printf("half moves : %d\ninput : %s\noutput : %s\n",hMoves,PGN,temp2);
     free(temp2);
+
+
+    printf("\n\nhasBoard :\n");
+    //TrueFEN is the board state for the fifth half move.
+    char TrueFEN[] = "rnbqkb1r/pppppp1p/5n2/6P1/8/5N2/PPPPPPP1/RNBQKB1R b KQkq - 1 3";
+    //FalseFEN is impossible.(always false)
+    char FalseFEN[] = "rnbqkb1r/pppppp1p/5n2/6P1/8/5N2/1PP1PPP1/RNBQKB1R b KQkq - 1 3";
+    hMoves = 8;
+    bool temp3 = hasBoard(PGN,TrueFEN,hMoves);
+    bool temp4 = hasBoard(PGN,FalseFEN,hMoves);
+    printf("half moves : %d\ninput : %s\noutput : \n%s for %s\n%s for %s",hMoves,PGN,temp3 ? "true" : "false",TrueFEN,temp4 ? "true" : "false",FalseFEN);
 }
