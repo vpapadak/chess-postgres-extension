@@ -11,7 +11,7 @@ int main(){
                  "11. cxb3 Ncb4 12. g6 Qxc3+ 13. Qc2 d6 14. gxh7+ Kh8 "
                  "15. Qxc3 Bxc3 16. Bxb4 Kg7 17. h8=R Nxb4 18. Be2 Kf6 "
                  "19. Rhf1 Kg7 20. Rfh1 Na6 21. R1h4*";
-    char* h = getFirstMoves(str,25);
+    char* h = getFirstMoves(str,7);
     printf("input : %s\noutput : %s\n",str,h);
     free(h);
     return 0;
@@ -22,21 +22,21 @@ int main(){
 char* getFirstMoves(const char* PGN, int N){
     int hMovesRemaining = N % 2;
     int fullMoves = (N/2)+hMovesRemaining;
-    if(hMovesRemaining == 0){hMovesRemaining=2;};
+    if(hMovesRemaining == 0){hMovesRemaining=2;}
 
     size_t length = strlen(PGN);
     char PGNcopy[length];
     strcpy(PGNcopy,PGN);
 
     char firstMoves[N+fullMoves][7];
-    char* firstMovesSolution = (char*)malloc((N+fullMoves)*7 * sizeof(char));
+    char* firstMovesSolution = (char*)malloc(((N+fullMoves)*7) * sizeof(char));
+    strcpy(firstMovesSolution,"");
 
     const char* separators = " .";
     char strFullMoves[10];
     sprintf(strFullMoves, "%d", fullMoves);
 
-    char* strToken = (char*)malloc(7 * sizeof(char));
-    strToken = strtok(PGNcopy, separators);
+    char* strToken = strtok(PGNcopy, separators);
     int finalMove = strcmp(strToken, strFullMoves);
 
     char period[] = ".";
@@ -67,7 +67,6 @@ char* getFirstMoves(const char* PGN, int N){
         }
         count += 3;
     };
-    char * temp;
     for(int i = 0;i<N+fullMoves;i++){
         strcat(firstMovesSolution,firstMoves[i]);
     };
