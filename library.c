@@ -3,7 +3,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include <math.h>
 
 int main(){
     testFunctions();
@@ -81,10 +80,10 @@ const char* getFirstMoves(const char* PGN, int N){
             }
         }
         count += 3;//+3 because we have (move number, first half move, second half move)
-    };
+    }
     for(int i = 0;i<N+fullMoves;i++){//iteration to concatenate the list of move numbers and half moves into a single string
         strcat(firstMovesSolution,firstMoves[i]);
-    };
+    }
     return firstMovesSolution;
 }
 //TODO do not allow an number of half moves greater that what we have
