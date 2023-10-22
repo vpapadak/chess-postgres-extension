@@ -10,7 +10,7 @@ char* getBoard(const char*, int);
  *Returns the chessgame truncated to its first N half-moves.*/
 const char* getFirstMoves(const char*, int);
 
-/*hasOpening(chessgame, chessgame) -> chessgame
+/*hasOpening(chessgame, chessgame) -> bool
  *Returns true if the first chessgame starts with the exact same
  *set of moves as the second chess game.*/
 bool hasOpening(const char*, const char*);
