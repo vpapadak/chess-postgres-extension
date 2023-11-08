@@ -1,0 +1,5 @@
+#chess extension
+comment = 'chess - input/output functions for SAN and FEN notations'
+default_version = '1.0'
+module_pathname = '$libdir/chess.so'
+relocatable = true
