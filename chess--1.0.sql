@@ -31,7 +31,7 @@ CREATE TYPE san (
     output = san_output);
 
 CREATE TYPE fen (
-    internallength = 100,
+    internallength = 850,
     input = fen_input,
     output = fen_output);
 
