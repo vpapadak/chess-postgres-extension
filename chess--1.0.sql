@@ -62,3 +62,25 @@ CREATE OPERATOR <> (
     PROCEDURE = san_ne,
     COMMUTATOR = <>, NEGATOR = =
     );
+/*
+ *FUNCTIONS
+ */
+CREATE OR REPLACE FUNCTION get_first_moves(san,int)
+    RETURNS cstring
+    AS 'MODULE_PATHNAME','get_first_moves'
+    LANGUAGE C IMMUTABLE STRICT PARALLEL SAFE;
+
+CREATE OR REPLACE FUNCTION get_board(san,int)
+    RETURNS cstring
+    AS 'MODULE_PATHNAME','get_board'
+    LANGUAGE C IMMUTABLE STRICT PARALLEL SAFE;
+
+CREATE OR REPLACE FUNCTION has_opening(san,san)
+    RETURNS boolean
+    AS 'MODULE_PATHNAME','has_opening'
+    LANGUAGE C IMMUTABLE STRICT PARALLEL SAFE;
+
+CREATE OR REPLACE FUNCTION has_board(san,fen,int)
+    RETURNS boolean
+    AS 'MODULE_PATHNAME','has_board'
+    LANGUAGE C IMMUTABLE STRICT PARALLEL SAFE;
