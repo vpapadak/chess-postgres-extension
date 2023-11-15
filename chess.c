@@ -253,6 +253,7 @@ char* internal_get_board(const char* PGN, int N){
     uint16_t halfMoves = (uint16_t)N;
     SCL_recordApply(record, board, halfMoves);//Applies the record of moves one after another on a board
 
+    strcpy(solution, firstMoves);
     free(firstMoves);
     return solution;
 }
