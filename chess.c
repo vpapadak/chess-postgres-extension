@@ -102,8 +102,8 @@ Datum has_board(PG_FUNCTION_ARGS) {
     Fen *fen = PG_GETARG_FEN_P(1); // Get input text as a text pointer
     char *input_fen = palloc0(sizeof(100));
     int len = 100;//87
-    snprintf(input_fen,len,"%s/%s/%s/%s/%s/%s/%s/%s %s %s %s %s %s", fen->board[0],fen->board[1],fen->board[2],fen->board[3],fen->board[4],fen->board[5]
-            ,fen->board[6],fen->board[7],fen->turn,fen->rock,fen->en_passant,fen->half_move,fen->full_move);
+    snprintf(input_fen,len,"%s/%s/%s/%s/%s/%s/%s/%s", fen->board[0],fen->board[1],fen->board[2],fen->board[3],fen->board[4],fen->board[5]
+            ,fen->board[6],fen->board[7]);
     int input_int = PG_GETARG_INT32(1);
     PG_RETURN_BOOL(internal_has_board(input_san,input_fen,input_int));
 }
@@ -242,8 +242,51 @@ char* internal_get_first_moves(const char* PGN, int N){
     return firstMovesSolution;
 }
 
+char* get_only_board(SCL_Board board){
+    char* solution;
+    solution = (char*)malloc(85 * sizeof(char));
+    int t = SCL_boardToFEN(board, solution);
+    strcpy(solution, board);
+    char* parseSolution = (char*)malloc(85 * sizeof(char)); 
+    strcpy(parseSolution, "");
+    int count = 0;
+    char strcount[2];
+    char temp[2];
+    for(int i=0; i<8; i++){
+        count = 0;
+        for(int k = i*8; k<(i+1)*8; k++){
+            sprintf(temp, "%c", solution[k]);
+            if (strcmp(temp, ".")==0){
+                count++;
+            }
+            else{
+                if (count>0){
+                    sprintf(strcount, "%d", count);
+                    strcat(parseSolution, strcount);
+                    count = 0;
+                }
+                strcat(parseSolution, temp);
+                
+            }
+        }
+        if (count>0){
+            sprintf(strcount, "%d", count);
+            strcat(parseSolution, strcount);
+                    
+        }        
+        if(i<7){
+            strcat(parseSolution, "/");
+            
+        }  
+        
+    }
+    free(solution);
+    return parseSolution;
+}
+
 char* internal_get_board(const char* PGN, int N){
-    char* solution = (char*)malloc(70 * sizeof(char));//allocation of size 70 char(FEN notation does not exceed 70 character)
+    char* solution;
+    solution = (char*)malloc(85 * sizeof(char));//allocation of size 85 char(FEN notation does not exceed 85 character)
     strcpy(solution,"");//Copy empty stream into the char* to remove unwanted artifacts
     SCL_Record record;//Hold record of the game
     char* firstMoves = internal_get_first_moves(PGN,N);
@@ -251,11 +294,12 @@ char* internal_get_board(const char* PGN, int N){
     SCL_Board board;//Holds state of the board
     SCL_boardInit(board);
     uint16_t halfMoves = (uint16_t)N;
-    SCL_recordApply(record, board, halfMoves);//Applies the record of moves one after another on a board
-
-    strcpy(solution, firstMoves);
+    SCL_recordApply(record, board, halfMoves);//Applies the record of moves one after another on a board    
+    char* parseSolution = get_only_board(board);
+    ereport(INFO, errmsg("%x", board[64]));
+    //int en_passant_castling = strtol(board[64], NULL, 16);
     free(firstMoves);
-    return solution;
+    return parseSolution;
 }
 
 bool internal_has_opening(const char* PGNone, const char* PGNtwo){
@@ -296,17 +340,20 @@ bool internal_has_opening(const char* PGNone, const char* PGNtwo){
  * at a time instead of recreating the board for the PGN notation for every half moves
  * until we arrive at N*/
 bool internal_has_board(const char* PGN, const char* FEN, int N){
+    char *token = (char*)malloc(72 * sizeof(char));
     bool solution = true;
     int countHalfMoves = 0;//start the half moves counter at one
     int found = 1;//found the game state is false by default
     while((countHalfMoves<N+1 && found != 0)){//stop when we have verified all the half moves or if we find the board state
         char* tempFirstMovesBoard = internal_get_board(PGN, countHalfMoves);//getting the FEN of the board state for every half move played
-        found = strcmp(FEN, tempFirstMovesBoard);//compare the board state every time a move is played
+        token = strtok(tempFirstMovesBoard, " ");
+        found = strcmp(FEN, token);//compare the board state every time a move is played
         countHalfMoves += 1;
         free(tempFirstMovesBoard);
     }
     if((countHalfMoves == N+1 && found != 0) || N<0){//verify if we have found the board state or if we have finished iterating without finding anything
         solution = false;
     }
+    free(token);
     return solution;
 }
